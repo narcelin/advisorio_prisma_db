@@ -14,7 +14,6 @@ model course {
   name                                                                   String?               @db.VarChar
   description                                                            String?
   teacher                                                                String?               @db.VarChar
-  course_prerequisite_id                                                 Int?
   special_requirements                                                   Boolean?
   course_cluster                                                         Int?
   course_cluster_link                                                    course_cluster_link[]
@@ -37,10 +36,12 @@ model course_cluster_link {
   id         String    @id @default(uuid())
   created_at DateTime? @default(now())
 
+  //Relations
   course_cluster_id String?
-  course_id         String?
   course_cluster    course_cluster? @relation(fields: [course_cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  course            course?         @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  course_id String?
+  course    course? @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model course_prerequisite {

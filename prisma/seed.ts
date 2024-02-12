@@ -18,17 +18,52 @@ const students = [
 
 const courses = [
     {
-        name: 'College Writting I',
-        
-        
-    }
+        name: 'Math for Liberal Arts 1',
+    },
+    {
+        name: 'Mather for Liberal Arts 2',
+    },
+    {
+        name: 'College Algebra',
+    },
+    {
+        name: 'Inntroductory Statistics',
+    },
+    {
+        name: 'Calculus with Analytic Geometry 1',
+    },
+    {
+        name: 'Computer Programming & Data Literacy for Everyone',
+    },
+    {
+        name: 'Precalculus Algebra & Trigonometry',
+    },
+    {
+        name: 'Intro Calculus w/Applications',
+    },
+    {
+        name: 'Method of Calculus',
+    },
+    {
+        name: 'Life Science Calculus 1',
+    },
+    {
+        name: 'Calculus with Analytic Geometry',
+    },
+    {
+        name: 'Logic',
+    },
 ]
 
 const course_clusters = [
     {
         title: 'Foundations of Written Communications',
         requirements: '6 credit hours and a C or heigher'
-    }
+    },
+    {
+        title: 'Foundations of Written Communications',
+        requirements: '6 credit hours and a C or heigher'
+    },
 ]
 
 const course_cluster_links = [
@@ -55,12 +90,21 @@ const degree_course_cluster_links = [
     }
 ]
 
-async function main() {
-    for(const degree_course_cluster_link of degree_course_cluster_links){
-        await prisma.degree_course_cluster_link.create({
-            data: degree_course_cluster_link
-        })
+const course_prerequisites = [
+    {
+        course_id: '15a17b5c-861e-4255-a9ca-8b2b4b05e00f'
     }
+]
+
+async function main() {
+        await prisma.course_cluster_link.createMany({
+            data:    [{
+                course_id: '689c722e-1c46-4330-8276-8084e61225c4'
+            },{
+                course_id: 'b18e54de-1d24-4929-b419-eaef23ab1deb'
+            }]
+        })
+    
 }
 
 main()
