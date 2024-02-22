@@ -7,41 +7,73 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model course {
+model student {
   id         String    @id @default(uuid())
   created_at DateTime? @default(now())
 
-  name                                                                   String?               @db.VarChar
-  description                                                            String?
-  teacher                                                                String?               @db.VarChar
-  special_requirements                                                   Boolean?
-  course_cluster                                                         Int?
-  course_cluster_link                                                    course_cluster_link[]
-  course_prerequisite_course_prerequisite_course_idTocourse              course_prerequisite[] @relation("course_prerequisite_course_idTocourse")
-  course_prerequisite_course_prerequisite_prerequisite_course_idTocourse course_prerequisite[] @relation("course_prerequisite_prerequisite_course_idTocourse")
-  courses_taken                                                          courses_taken[]
+  role       String? @db.VarChar
+  username   String? @db.VarChar
+  firstName  String?
+  lastName   String?
+  password   String? @db.VarChar
+  college_of String? @db.VarChar
+
+  //Relationships
+  course_taken course_taken[]
+
+  degree_id String?
+  degree    degree? @relation(fields: [degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model degree {
+  id         String    @id @default(uuid())
+  created_at DateTime? @default(now())
+
+  title       String? @db.VarChar
+  description String?
+
+  //RELATIONS
+  student student[]
+
+  degree_course_cluster_junction degree_course_cluster_junction[]
+}
+
+model degree_course_cluster_junction {
+  id        String    @id @default(uuid())
+  create_at DateTime? @default(now())
+
+  //RELATIONS
+  degree_id String
+  degree    degree @relation(fields: [degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  course_cluster_id String
+  course_cluster    course_cluster @relation(fields: [course_cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model course_cluster {
   id        String    @id @default(uuid())
   create_at DateTime? @default(now())
 
-  title                      String?                      @db.VarChar
-  requirements               String?
-  course_cluster_link        course_cluster_link[]
-  degree_course_cluster_link degree_course_cluster_link[]
+  title        String? @db.VarChar
+  requirements String?
+
+  //RELATIONS
+  degree_course_cluster_junction degree_course_cluster_junction[]
 }
 
-model course_cluster_link {
+model course {
   id         String    @id @default(uuid())
   created_at DateTime? @default(now())
 
-  //Relations
-  course_cluster_id String?
-  course_cluster    course_cluster? @relation(fields: [course_cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  name                 String?  @db.VarChar
+  description          String?
+  teacher              String?  @db.VarChar
+  special_requirements Boolean?
 
-  course_id String?
-  course    course? @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_prerequisite_course_prerequisite_course_idTocourse              course_prerequisite[] @relation("course_prerequisite_course_idTocourse")
+  course_prerequisite_course_prerequisite_prerequisite_course_idTocourse course_prerequisite[] @relation("course_prerequisite_prerequisite_course_idTocourse")
+  course_taken                                                           course_taken[]
 }
 
 model course_prerequisite {
@@ -54,50 +86,18 @@ model course_prerequisite {
   course_course_prerequisite_prerequisite_course_idTocourse course? @relation("course_prerequisite_prerequisite_course_idTocourse", fields: [prerequisite_course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model courses_taken {
+model course_taken {
   id         String    @id @default(uuid())
   created_at DateTime? @default(now())
 
-  student_id String?
-  course_id  String?
-  course     course?  @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  student    student? @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
+  //Relations
+  student_id String
+  student    student @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  grade      Int?
+  //credits earned?
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model degree {
-  id         String    @id @default(uuid())
-  created_at DateTime? @default(now())
-
-  title                      String?                      @db.VarChar
-  description                String?
-  degree_course_cluster_link degree_course_cluster_link[]
-  student                    student[]
-}
-
-model degree_course_cluster_link {
-  id        String    @id @default(uuid())
-  create_at DateTime? @default(now())
-
-  degree_id         String?
-  course_cluster_id String?
-  course_cluster    course_cluster? @relation(fields: [course_cluster_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  degree            degree?         @relation(fields: [degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model student {
-  id         String    @id @default(uuid())
-  created_at DateTime? @default(now())
-
-  role          String?         @db.VarChar
-  username      String?         @db.VarChar
-  firstName     String?
-  lastName      String?
-  password      String?         @db.VarChar
-  college_of    String?         @db.VarChar
-  degree_id     String?
-  courses_taken courses_taken[]
-  degree        degree?         @relation(fields: [degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_id String
+  course    course @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum Role {
